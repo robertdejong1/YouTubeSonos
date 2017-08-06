@@ -3,7 +3,7 @@ YouTubeSonos
 
 A Sonos Music API (SMAPI) implementation to enable YouTube on Sonos
 
-Current include:
+Current features include:
 
 * Browsing popular music
 * Browsing user playlists
