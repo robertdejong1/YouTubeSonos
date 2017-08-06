@@ -1,0 +1,49 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+configurations {
+    jaxws
+}
+
+dependencies {
+    compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
+    compile 'com.google.apis:google-api-services-youtube:v3-rev183-1.22.0'
+
+    testCompile 'junit:junit:4.12'
+
+    jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
+}
+
+mainClassName = 'App'
+
+task wsimport {
+    ext.destDir = file("${projectDir}/src/main/java")
+    doLast {
+        ant {
+            sourceSets.main.output.classesDir.mkdirs()
+            destDir.mkdirs()
+            taskdef(name: 'wsimport',
+                    classname: 'com.sun.tools.ws.ant.WsImport',
+                    classpath: configurations.jaxws.asPath
+            )
+            wsimport(keep: true,
+                    destdir: sourceSets.main.output.classesDir,
+                    sourcedestdir: destDir,
+                    extension: "true",
+                    verbose: "false",
+                    quiet: "false",
+                    package: "smapi",
+                    xnocompile: "true",
+                    xadditionalHeaders: "true",
+                    wsdl: 'Sonos.wsdl',
+                    wsdlLocation: 'Sonos.wsdl') {
+                xjcarg(value: "-XautoNameResolution")
+            }
+        }
+    }
+}

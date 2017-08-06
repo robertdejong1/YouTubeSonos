@@ -1,0 +1,287 @@
+package youtubesonos;
+
+import smapi.*;
+import youtubesonos.youtube.YT;
+import youtubesonos.youtube.YouTubeAuthReceiver;
+
+import javax.annotation.Resource;
+import javax.jws.WebService;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.Holder;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@WebService(endpointInterface = "smapi.SonosSoap")
+public class SonosApi implements SonosSoap {
+
+    @Resource
+    private WebServiceContext webServiceContext;
+    private SonosMetadata sonosMetadata;
+
+    public SonosApi() {
+        sonosMetadata = new SonosMetadata(this);
+    }
+
+    @Override
+    public String getSessionId(String username, String password, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public MediaList getMetadata(String id, int index, int count, Boolean recursive, Credentials credentials, Context context) throws CustomFault {
+        verifyCredentials(credentials);
+        String userId = SonosAuth.getUserId(credentials);
+
+        if (id.equals("root")) {
+            return sonosMetadata.getRoot();
+        }
+
+        else if (id.equals("popularMusic")) {
+            return sonosMetadata.getPopularMusicVideos(index, count, userId);
+        }
+
+        else if (id.equals("playlists")) {
+            return sonosMetadata.getPlaylists(index, count, userId);
+        }
+
+        else if (id.equals("subscriptions")) {
+            return sonosMetadata.getSubscriptions(index, count, userId);
+        }
+
+        else if (id.startsWith(IdPrefix.CHANNEL.toString())) {
+            return sonosMetadata.getChannelContents(id.substring(IdPrefix.CHANNEL.toString().length()), index, count, userId);
+        }
+
+        else if (id.startsWith(IdPrefix.PLAYLIST.toString())) {
+            return sonosMetadata.getPlaylistVideos(id.substring(IdPrefix.PLAYLIST.toString().length()), index, count, userId);
+        }
+
+        else if (id.startsWith(IdPrefix.CHANNELPLAYLISTS.toString())) {
+            return sonosMetadata.getChannelPlaylists(id.substring(IdPrefix.CHANNELPLAYLISTS.toString().length()), index, count, userId);
+        }
+
+        throw SonosFaults.ITEM_NOT_FOUND;
+    }
+
+    @Override
+    public ExtendedMetadata getExtendedMetadata(String id, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public String getExtendedMetadataText(String id, String type, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public UserInfo getUserInfo(Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public ItemRating rateItem(String id, int rating, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public MediaList search(String id, String term, int index, int count, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public MediaMetadata getMediaMetadata(String id, Credentials credentials, Context context) throws CustomFault {
+        verifyCredentials(credentials);
+
+        if (id.startsWith(IdPrefix.VIDEO.toString())) {
+            return sonosMetadata.getMediaMetadata(id.substring(IdPrefix.VIDEO.toString().length()), SonosAuth.getUserId(credentials));
+        }
+
+        throw SonosFaults.ITEM_NOT_FOUND;
+    }
+
+    @Override
+    public void getMediaURI(String id, MediaUriAction action, Integer secondsSinceExplicit, Holder<String> deviceSessionToken, Holder<String> getMediaURIResult, Holder<EncryptionContext> deviceSessionKey, Holder<EncryptionContext> contentKey, Holder<HttpHeaders> httpHeaders, Holder<Integer> uriTimeout, Holder<PositionInformation> positionInformation, Holder<String> privateDataFieldName, Credentials credentials, Context context) throws CustomFault {
+        verifyCredentials(credentials);
+
+        if (id.startsWith(IdPrefix.VIDEO.toString())) {
+            String videoId = id.substring(IdPrefix.VIDEO.toString().length());
+            try {
+                //Hack to make server download m4a file first.
+                URL urlObj = new URL(S.getResources().getString(S.MEDIA_SERVER_URL) + "/youtube-dl.php?video=" + videoId);
+                ((HttpURLConnection) urlObj.openConnection()).getResponseCode();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            getMediaURIResult.value = String.format(S.getResources().getString(S.MEDIA_SERVER_URL) + "/ytfiles/%s.m4a", videoId);
+        }
+        else {
+            throw SonosFaults.ITEM_NOT_FOUND;
+        } 
+    }
+
+    @Override
+    public String getScrollIndices(String id, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public String createItem(String favorite, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public void deleteItem(String favorite, Credentials credentials, Context context) throws CustomFault {
+
+    }
+
+    @Override
+    public LastUpdate getLastUpdate(Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public void reportStatus(String id, int errorCode, String message, Credentials credentials, Context context) throws CustomFault {
+
+    }
+
+    @Override
+    public void setPlayedSeconds(String id, int seconds, String contextId, String privateData, Integer offsetMillis, Credentials credentials, Context context) throws CustomFault {
+
+    }
+
+    @Override
+    public ReportPlaySecondsResult reportPlaySeconds(String id, int seconds, String contextId, String privateData, Integer offsetMillis, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public void reportPlayStatus(String id, String status, String contextId, Integer offsetMillis, Credentials credentials, Context context) throws CustomFault {
+
+    }
+
+    @Override
+    public void reportAccountAction(String type, Credentials credentials, Context context) throws CustomFault {
+
+    }
+
+    @Override
+        public AppLinkResult getAppLink(String householdId, String hardware, String osVersion, String sonosAppName, String callbackPath, Credentials credentials, Context context) throws CustomFault {
+        try {
+            AppLinkResult appLinkResult = new AppLinkResult();
+            AppLinkInfo appLinkInfo = new AppLinkInfo();
+            DeviceLinkCodeResult deviceLinkCode = new DeviceLinkCodeResult();
+
+            String linkCode = SonosAuth.generateLinkCode();
+            String userId = SonosAuth.generateUserId();
+
+            YouTubeAuthReceiver.getInstance().addPendingLinkCodeUserId(linkCode, userId);
+
+            deviceLinkCode.setLinkCode(linkCode);
+            deviceLinkCode.setRegUrl(YT.getNewAuthorizationUrl(YouTubeAuthReceiver.getInstance().getRedirectUri(), linkCode));
+
+            appLinkInfo.setAppUrlStringId("SIGN_IN");
+            appLinkInfo.setDeviceLink(deviceLinkCode);
+            appLinkResult.setAuthorizeAccount(appLinkInfo);
+
+            return appLinkResult;
+        }
+        catch (Exception e) {
+            throw new CustomFault("Could not retrieve registration URL", new CustomFaultDetail(), e);
+        }
+    }
+
+    @Override
+    public DeviceLinkCodeResult getDeviceLinkCode(String householdId, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public DeviceAuthTokenResult getDeviceAuthToken(String householdId, String linkCode, String linkDeviceId, String callbackPath, Credentials credentials, Context context) throws CustomFault {
+        if (YouTubeAuthReceiver.getInstance().successLinkCodeExists(linkCode)) {
+            DeviceAuthTokenResult tokenResult = new DeviceAuthTokenResult();
+            String userId = YouTubeAuthReceiver.getInstance().getUserIdForSuccessLinkCode(linkCode);
+            tokenResult.setAuthToken(userId);
+            return tokenResult;
+        }
+        else if (YouTubeAuthReceiver.getInstance().pendingLinkCodeExists(linkCode)) {
+            throw SonosFaults.NOT_LINKED_RETRY;
+        }
+        else {
+            throw SonosFaults.NOT_LINKED_FAILURE;
+        }
+    }
+
+    @Override
+    public DeviceAuthTokenResult refreshAuthToken(Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public SegmentMetadataList getStreamingMetadata(String id, XMLGregorianCalendar startTime, int duration, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public ContentKey getContentKey(String id, String uri, String deviceSessionToken, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public CreateContainerResult createContainer(String containerType, String title, String parentId, String seedId, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public AddToContainerResult addToContainer(String id, String parentId, int index, String updateId, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public RenameContainerResult renameContainer(String id, String title, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public DeleteContainerResult deleteContainer(String id, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public RemoveFromContainerResult removeFromContainer(String id, String indices, String updateId, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    @Override
+    public ReorderContainerResult reorderContainer(String id, String from, int to, String updateId, Credentials credentials, Context context) throws CustomFault {
+        return null;
+    }
+
+    public List<Locale> getLocales() {
+        Map headers = (Map) webServiceContext.getMessageContext().get(MessageContext.HTTP_REQUEST_HEADERS);
+        if (headers.containsKey("Accept-Language")) {
+            String acceptLanguage = (String)((List)headers.get("Accept-Language")).get(0);
+            return Locale.LanguageRange.parse(acceptLanguage).stream().map(range -> new Locale(range.getRange())).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
+    private void verifyCredentials(Credentials credentials) throws CustomFault {
+        try {
+            if (!SonosAuth.verifyCredentials(credentials)) {
+                throw SonosFaults.LOGIN_INVALID;
+            }
+        }
+        catch (IOException e) {
+            throw SonosFaults.LOGIN_INVALID;
+        }
+    }
+}

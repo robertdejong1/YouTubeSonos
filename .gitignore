@@ -1,0 +1,14 @@
+#Directories
+.credentials/
+.gradle/
+.idea/
+build/
+out/
+
+#Files
+src/main/resources/client_secret.json
+.DS_Store
+
+*.class
+*.iml
+*.log
