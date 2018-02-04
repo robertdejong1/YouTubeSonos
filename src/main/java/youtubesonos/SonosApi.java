@@ -1,6 +1,9 @@
 package youtubesonos;
 
 import smapi.*;
+import youtubesonos.builders.AppLinkInfoBuilder;
+import youtubesonos.builders.AppLinkResultBuilder;
+import youtubesonos.builders.DeviceLinkCodeResultBuilder;
 import youtubesonos.youtube.YT;
 import youtubesonos.youtube.YouTubeAuthReceiver;
 
@@ -174,25 +177,22 @@ public class SonosApi implements SonosSoap {
     }
 
     @Override
-        public AppLinkResult getAppLink(String householdId, String hardware, String osVersion, String sonosAppName, String callbackPath, Credentials credentials, Context context) throws CustomFault {
+    public AppLinkResult getAppLink(String householdId, String hardware, String osVersion, String sonosAppName, String callbackPath, Credentials credentials, Context context) throws CustomFault {
         try {
-            AppLinkResult appLinkResult = new AppLinkResult();
-            AppLinkInfo appLinkInfo = new AppLinkInfo();
-            DeviceLinkCodeResult deviceLinkCode = new DeviceLinkCodeResult();
-
             String linkCode = SonosAuth.generateLinkCode();
             String userId = SonosAuth.generateUserId();
-
             YouTubeAuthReceiver.getInstance().addPendingLinkCodeUserId(linkCode, userId);
 
-            deviceLinkCode.setLinkCode(linkCode);
-            deviceLinkCode.setRegUrl(YT.getNewAuthorizationUrl(YouTubeAuthReceiver.getInstance().getRedirectUri(), linkCode));
-
-            appLinkInfo.setAppUrlStringId("SIGN_IN");
-            appLinkInfo.setDeviceLink(deviceLinkCode);
-            appLinkResult.setAuthorizeAccount(appLinkInfo);
-
-            return appLinkResult;
+            return new AppLinkResultBuilder()
+                    .setAuthorizeAccount(new AppLinkInfoBuilder()
+                            .setDeviceLink(new DeviceLinkCodeResultBuilder()
+                                    .setLinkCode(linkCode)
+                                    .setRegUrl(YT.getNewAuthorizationUrl(YouTubeAuthReceiver.getInstance().getRedirectUri(), linkCode)))
+                            .setAppUrlStringId("SIGN_IN"))
+                    .setCreateAccount(new AppLinkInfoBuilder()
+                            .setAppUrlStringId("SIGN_UP")
+                            .setAppUrl("https://www.youtube.com/account"))
+                    .build();
         }
         catch (Exception e) {
             throw new CustomFault("Could not retrieve registration URL", new CustomFaultDetail(), e);
