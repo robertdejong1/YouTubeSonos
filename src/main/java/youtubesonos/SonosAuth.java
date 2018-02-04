@@ -16,7 +16,7 @@ public class SonosAuth {
     }
 
     public static String generateUserId() {
-        return randomString(2048);
+        return randomString(2040);
     }
 
     private static String randomString( int len ){
