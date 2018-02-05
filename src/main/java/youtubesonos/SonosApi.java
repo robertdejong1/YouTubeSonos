@@ -5,7 +5,7 @@ import youtubesonos.builders.AppLinkInfoBuilder;
 import youtubesonos.builders.AppLinkResultBuilder;
 import youtubesonos.builders.DeviceLinkCodeResultBuilder;
 import youtubesonos.youtube.YT;
-import youtubesonos.youtube.YouTubeAuthReceiver;
+import youtubesonos.youtube.YouTubeAuthHttpHandler;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -181,13 +181,13 @@ public class SonosApi implements SonosSoap {
         try {
             String linkCode = SonosAuth.generateLinkCode();
             String userId = SonosAuth.generateUserId();
-            YouTubeAuthReceiver.getInstance().addPendingLinkCodeUserId(linkCode, userId);
+            YouTubeAuthHttpHandler.getInstance().addPendingLinkCodeUserId(linkCode, userId);
 
             return new AppLinkResultBuilder()
                     .setAuthorizeAccount(new AppLinkInfoBuilder()
                             .setDeviceLink(new DeviceLinkCodeResultBuilder()
                                     .setLinkCode(linkCode)
-                                    .setRegUrl(YT.getNewAuthorizationUrl(YouTubeAuthReceiver.getInstance().getRedirectUri(), linkCode)))
+                                    .setRegUrl(YT.getNewAuthorizationUrl(YouTubeAuthHttpHandler.getInstance().getRedirectUri(), linkCode)))
                             .setAppUrlStringId("SIGN_IN"))
                     .setCreateAccount(new AppLinkInfoBuilder()
                             .setAppUrlStringId("SIGN_UP")
@@ -206,13 +206,13 @@ public class SonosApi implements SonosSoap {
 
     @Override
     public DeviceAuthTokenResult getDeviceAuthToken(String householdId, String linkCode, String linkDeviceId, String callbackPath, Credentials credentials, Context context) throws CustomFault {
-        if (YouTubeAuthReceiver.getInstance().successLinkCodeExists(linkCode)) {
+        if (YouTubeAuthHttpHandler.getInstance().successLinkCodeExists(linkCode)) {
             DeviceAuthTokenResult tokenResult = new DeviceAuthTokenResult();
-            String userId = YouTubeAuthReceiver.getInstance().getUserIdForSuccessLinkCode(linkCode);
+            String userId = YouTubeAuthHttpHandler.getInstance().getUserIdForSuccessLinkCode(linkCode);
             tokenResult.setAuthToken(userId);
             return tokenResult;
         }
-        else if (YouTubeAuthReceiver.getInstance().pendingLinkCodeExists(linkCode)) {
+        else if (YouTubeAuthHttpHandler.getInstance().pendingLinkCodeExists(linkCode)) {
             throw SonosFaults.NOT_LINKED_RETRY;
         }
         else {

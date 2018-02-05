@@ -79,7 +79,7 @@ public class YT {
 
     public static void authorizeNewUser(String userId, String code) throws IOException {
         GoogleAuthorizationCodeFlow flow = getGoogleAuthorizationCodeFlow();
-        TokenResponse response = flow.newTokenRequest(code).setRedirectUri(YouTubeAuthReceiver.getInstance().getRedirectUri()).execute();
+        TokenResponse response = flow.newTokenRequest(code).setRedirectUri(YouTubeAuthHttpHandler.getInstance().getRedirectUri()).execute();
         flow.createAndStoreCredential(response, userId);
     }
 

@@ -4,11 +4,11 @@ import base.Resources;
 
 public class S {
 
-    public static final String SMAPI_URL = "smapi_url";
-    public static final String AUTH_RECEIVER_HOST = "auth_receiver_host";
-    public static final String AUTH_RECEIVER_PORT = "auth_receiver_port";
-    public static final String AUTH_RECEIVER_URL = "auth_receiver_url";
-    public static final String AUTH_RECEIVER_CALLBACK_PATH = "auth_receiver_callback_path";
+    public static final String WEB_SERVER_HOST = "web_server_host";
+    public static final String WEB_SERVER_PORT = "web_server_port";
+    public static final String WEB_SERVER_URL = "web_server_url";
+    public static final String SMAPI_PATH = "smapi_path";
+    public static final String AUTH_PATH = "auth_path";
     public static final String MEDIA_SERVER_URL = "media_server_url";
 
     private static Resources resources;
