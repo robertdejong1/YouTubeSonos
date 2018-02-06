@@ -72,9 +72,15 @@ public class YT {
         return credential != null;
     }
 
+    public static boolean isUserExpired(String userId) throws IOException {
+        GoogleAuthorizationCodeFlow flow = getGoogleAuthorizationCodeFlow();
+        Credential credential = flow.loadCredential(userId);
+        return credential == null || (credential.getExpiresInSeconds() > 0 && credential.getRefreshToken() == null);
+    }
+
     public static String getNewAuthorizationUrl(String redirectUri, String state) throws IOException {
         GoogleAuthorizationCodeFlow flow = getGoogleAuthorizationCodeFlow();
-        return flow.newAuthorizationUrl().setRedirectUri(redirectUri).setState(state).build();
+        return flow.newAuthorizationUrl().setApprovalPrompt("force").setRedirectUri(redirectUri).setState(state).build();
     }
 
     public static void authorizeNewUser(String userId, String code) throws IOException {

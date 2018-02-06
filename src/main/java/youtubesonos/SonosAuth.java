@@ -30,7 +30,25 @@ public class SonosAuth {
         return credentials.getLoginToken().getToken();
     }
 
-    public static boolean verifyCredentials(Credentials credentials) throws IOException {
-        return YT.isUserAuthorized(getUserId(credentials));
+    public static VerifyCredentialsResult verifyCredentials(Credentials credentials) throws IOException {
+        String userId = getUserId(credentials);
+        return new VerifyCredentialsResult(YT.isUserAuthorized(userId), YT.isUserExpired(userId));
+    }
+
+    public static class VerifyCredentialsResult {
+        private boolean isAuthorized, isExpired;
+
+        public VerifyCredentialsResult(boolean isAuthorized, boolean isExpired) {
+            this.isAuthorized = isAuthorized;
+            this.isExpired = isExpired;
+        }
+
+        public boolean isAuthorized() {
+            return isAuthorized;
+        }
+
+        public boolean isExpired() {
+            return isExpired;
+        }
     }
 }

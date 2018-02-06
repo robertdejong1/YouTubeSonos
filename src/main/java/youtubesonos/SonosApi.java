@@ -276,11 +276,17 @@ public class SonosApi implements SonosSoap {
 
     private void verifyCredentials(Credentials credentials) throws CustomFault {
         try {
-            if (!SonosAuth.verifyCredentials(credentials)) {
+            SonosAuth.VerifyCredentialsResult verifyResult = SonosAuth.verifyCredentials(credentials);
+
+            if (verifyResult.isAuthorized() && verifyResult.isExpired()) {
+                throw SonosFaults.AUTH_TOKEN_EXPIRED;
+            }
+            else if (!verifyResult.isAuthorized()) {
                 throw SonosFaults.LOGIN_INVALID;
             }
         }
         catch (IOException e) {
+            e.printStackTrace();
             throw SonosFaults.LOGIN_INVALID;
         }
     }

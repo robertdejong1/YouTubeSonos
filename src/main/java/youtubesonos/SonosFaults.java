@@ -45,7 +45,8 @@ public class SonosFaults {
     }
 
     public static final CustomFault LOGIN_INVALID = getFault("Client.LoginInvalid", "The provided credentials are not valid for this service");
+    public static final CustomFault AUTH_TOKEN_EXPIRED = getFault("Client.AuthTokenExpired", "Your credentials have expired");
     public static final CustomFault NOT_LINKED_RETRY = getFault("Client.NOT_LINKED_RETRY", "Link code not yet authorized, try again.", 5);
-    public static final CustomFault NOT_LINKED_FAILURE = getFault("Client.NOT_LINKED_FAILURE", "Link code not valid");
+    public static final CustomFault NOT_LINKED_FAILURE = getFault("Client.NOT_LINKED_FAILURE", "Link code not valid", 6);
     public static final CustomFault ITEM_NOT_FOUND = getFault("Client.ItemNotFound", "The requested item could not be found");
 }
