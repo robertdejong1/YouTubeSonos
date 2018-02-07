@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<stringtables xmlns="http://sonos.com/sonosapi">
+    <stringtable rev="0" xml:lang="en-US">
+        <string stringId="Channels">Channels</string>
+        <string stringId="Videos">Videos</string>
+    </stringtable>
+    <stringtable rev="0" xml:lang="nl-NL">
+        <string stringId="Channels">Kanalen</string>
+        <string stringId="Videos">Video's</string>
+    </stringtable>
+</stringtables>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<PresentationMap type="Search">
+    <Match>
+        <SearchCategories>
+            <Category id="playlists" mappedId="playlists" />
+            <CustomCategory mappedId="channels" stringId="Channels" />
+            <CustomCategory mappedId="videos" stringId="Videos" />
+        </SearchCategories>
+    </Match>
+</PresentationMap>

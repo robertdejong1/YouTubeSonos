@@ -3,10 +3,7 @@ package youtubesonos;
 import base.Resources;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.*;
-import smapi.ItemType;
-import smapi.MediaCollection;
-import smapi.MediaList;
-import smapi.MediaMetadata;
+import smapi.*;
 import youtubesonos.youtube.PageTokenNotFoundException;
 import youtubesonos.youtube.YT;
 import youtubesonos.builders.MediaCollectionBuilder;
@@ -221,6 +218,41 @@ public class SonosMetadata {
         return null;
     }
 
+    public MediaList searchChannels(String term, int index, int count, String userId) {
+        return search("channel", term, index, count, userId);
+    }
+
+    public MediaList searchPlaylists(String term, int index, int count, String userId) {
+        return search("playlist", term, index, count, userId);
+    }
+
+    public MediaList searchVideos(String term, int index, int count, String userId) {
+        return search("video", term, index, count, userId);
+    }
+
+    private MediaList search(String type, String term, int index, int count, String userId) {
+        try {
+            SearchListResponse response = YT.search(term, type, userId, index);
+            List<SearchResult> results = response.getItems();
+
+            MediaListBuilder builder = new MediaListBuilder().setIndex(index).setTotal(response.getPageInfo().getTotalResults());
+
+            for (SearchResult result : results) {
+                if (count == 0) break;
+
+                builder.addMedia(createMedia(result));
+                count--;
+            }
+
+            return builder.setCalculatedCount().build();
+        }
+        catch (IOException | PageTokenNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     private MediaCollection createMediaCollection(Playlist playlist) {
         return new MediaCollectionBuilder()
                 .setId(IdPrefix.PLAYLIST + playlist.getId())
@@ -300,4 +332,49 @@ public class SonosMetadata {
                 .build();
     }
 
+    private AbstractMedia createMedia(SearchResult searchResult) {
+        if (searchResult.getId().getKind().equals("youtube#channel")) {
+            return createMediaCollectionForChannel(searchResult);
+        }
+        else if (searchResult.getId().getKind().equals("youtube#playlist")) {
+            return createMediaCollectionForPlaylist(searchResult);
+        }
+        else if (searchResult.getId().getKind().equals("youtube#video")) {
+            return createMediaMetadataForVideo(searchResult);
+        }
+        return null;
+    }
+
+    private MediaCollection createMediaCollectionForChannel(SearchResult searchResult) {
+        return new MediaCollectionBuilder()
+                .setId(IdPrefix.CHANNEL + searchResult.getId().getChannelId())
+                .setTitle(searchResult.getSnippet().getTitle())
+                .setItemType(ItemType.CONTAINER)
+                .setAlbumArtURI(YT.getWorstThumbnailUrl(searchResult.getSnippet().getThumbnails()))
+                .build();
+    }
+
+    private MediaCollection createMediaCollectionForPlaylist(SearchResult searchResult) {
+        return new MediaCollectionBuilder()
+                .setId(IdPrefix.PLAYLIST + searchResult.getId().getPlaylistId())
+                .setTitle(searchResult.getSnippet().getTitle())
+                .setItemType(ItemType.PLAYLIST)
+                .setAlbumArtURI(YT.getWorstThumbnailUrl(searchResult.getSnippet().getThumbnails()))
+                .setCanPlay(true)
+                .build();
+    }
+
+    private MediaMetadata createMediaMetadataForVideo(SearchResult searchResult) {
+        return new MediaMetadataBuilder()
+                .setId(IdPrefix.VIDEO + searchResult.getId().getVideoId())
+                .setTitle(searchResult.getSnippet().getTitle())
+                .setTrackMetadata(new TrackMetadataBuilder()
+                        .setArtist(searchResult.getSnippet().getChannelTitle())
+                        .setArtistId(searchResult.getSnippet().getChannelId())
+                        .setAlbumArtURI(YT.getWorstThumbnailUrl(searchResult.getSnippet().getThumbnails()))
+                        .setDuration(1))
+                .setMimeType("audio/aac")
+                .setItemType(ItemType.TRACK)
+                .build();
+    }
 }

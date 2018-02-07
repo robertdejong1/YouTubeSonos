@@ -235,4 +235,17 @@ public class YT {
 
         return response;
     }
+
+    public static SearchListResponse search(String term, String type, String userId, int pageIndex) throws PageTokenNotFoundException, IOException {
+        String pageTokenCacheKey = "search" + type + term;
+        PageTokenCacheItem pageTokenCacheItem = getPageTokenCacheItem(pageTokenCacheKey, userId, pageIndex);
+        String pageToken = pageTokenCacheItem.getPageToken();
+        YouTube youtube = getYouTubeService(userId);
+        YouTube.Search.List list = youtube.search().list("snippet").setQ(term).setType(type).setMaxResults((long)MAX_RESULTS).setPageToken(pageToken);
+        SearchListResponse response = list.execute();
+        setPageToken(pageTokenCacheKey, userId, pageTokenCacheItem.getPageIndex() + MAX_RESULTS, response.getNextPageToken());
+        cropItemsAccordingly(response.getItems(), pageIndex, pageTokenCacheItem.getPageIndex());
+
+        return response;
+    }
 }

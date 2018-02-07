@@ -96,6 +96,17 @@ public class SonosApi implements SonosSoap {
 
     @Override
     public MediaList search(String id, String term, int index, int count, Credentials credentials, Context context) throws CustomFault {
+        verifyCredentials(credentials);
+
+        if (id.equals("channels")) {
+            return sonosMetadata.searchChannels(term, index, count, SonosAuth.getUserId(credentials));
+        }
+        else if (id.equals("playlists")) {
+            return sonosMetadata.searchPlaylists(term, index, count, SonosAuth.getUserId(credentials));
+        }
+        else if (id.equals("videos")) {
+            return sonosMetadata.searchVideos(term, index, count, SonosAuth.getUserId(credentials));
+        }
         return null;
     }
 
