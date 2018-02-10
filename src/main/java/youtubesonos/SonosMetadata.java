@@ -49,6 +49,28 @@ public class SonosMetadata {
                 .build();
     }
 
+    public MediaList getSearch() {
+        List<Locale> locales = sonosApi.getLocales();
+
+        return new MediaListBuilder()
+                .addMedia(new MediaCollectionBuilder()
+                        .setId("channels")
+                        .setTitle(R.getResources().getString(R.CHANNELS, locales))
+                        .setItemType(ItemType.SEARCH))
+                .addMedia(new MediaCollectionBuilder()
+                        .setId("playlists")
+                        .setTitle(R.getResources().getString(R.PLAYLISTS, locales))
+                        .setItemType(ItemType.SEARCH))
+                .addMedia(new MediaCollectionBuilder()
+                        .setId("videos")
+                        .setTitle(R.getResources().getString(R.VIDEOS, locales))
+                        .setItemType(ItemType.SEARCH))
+                .setIndex(0)
+                .setTotal(3)
+                .setCalculatedCount()
+                .build();
+    }
+
     public MediaList getSubscriptions(int index, int count, String userId) {
         try {
             SubscriptionListResponse response = YT.getSubscriptions(userId, index);

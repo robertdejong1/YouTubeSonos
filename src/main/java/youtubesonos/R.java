@@ -7,6 +7,8 @@ public class R {
     public static final String POPULAR_MUSIC = "popular_music";
     public static final String PLAYLISTS = "playlists";
     public static final String SUBSCRIPTIONS = "subscriptions";
+    public static final String CHANNELS = "channels";
+    public static final String VIDEOS = "videos";
 
     private static Resources resources;
 

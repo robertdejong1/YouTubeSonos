@@ -47,6 +47,10 @@ public class SonosApi implements SonosSoap {
             return sonosMetadata.getRoot();
         }
 
+        else if (id.equals("search")) {
+            return sonosMetadata.getSearch();
+        }
+
         else if (id.equals("popularMusic")) {
             return sonosMetadata.getPopularMusicVideos(index, count, userId);
         }
