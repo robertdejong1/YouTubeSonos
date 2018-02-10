@@ -8,8 +8,8 @@ Current features include:
 * Browsing popular music
 * Browsing user playlists
 * Browsing user subscriptions (videos and playlists)
+* Searching for channels, playlists and videos
 * Playing sound from a video
-
 
 ## How it works
 
@@ -22,15 +22,15 @@ First, you will need to obtain a YouTube Data API key. To do so, follow the firs
 
 Then you should configure the various settings in `src/main/resources/Settings.properties`:
 
-* **smapi_url**: the URL on which the SMAPI will be available.
+* **web_server_host**: the host on which the web server will be available.
 
-* **auth_receiver_host**: the host on which the YouTube OAuth receiver will be available
+* **web_server_port**: the port on which the web server will be available.
 
-* **auth_receiver_port**: the port on which the YouTube OAuth receiver will be available
+* **web_server_url**: the URL on which the web server will be accessible. An actual domain name is required, because Google doesn't allow an IP address to be used as a redirect URL for OAuth2 authentication. Make sure that this domain name points to your IP address.
 
-* **auth_receiver_url**: the URL on which the YouTube OAuth receiver will be available
+* **smapi_path**: the path on which the SMAPI will be available.
 
-* **auth_receiver_callback_path**: the path on which the YouTube OAuth receiver will be available. This and `auth_receiver_url` are used as redirect URL after the user completes OAuth2 authentication. Make sure that this URL is listed as redirect URL in your project. Otherwise Google will return an error upon opening the authentication page.
+* **auth_path**: the path on which the YouTube OAuth callbacks will be received. This and `web_server_url` are used as redirect URL after the user completes OAuth2 authentication. Make sure that this URL is listed as redirect URL in your project. Otherwise Google will return an error upon opening the authentication page.
 
 * **media_server_url**: the URL on which `youtube-dl.php` is available. Note that the user that runs this script (usually www-data) should have write permissions on a folder named `ytfiles` next to this script. Also, `youtube-dl` should be available.
 
@@ -47,7 +47,7 @@ Fill in the fields as follows:
 
 * **Service Name**: YouTube
 
-* **Endpoint URL**: the value provided for smapi_url. Note that if you are using 0.0.0.0 you should use an actual IP address on which the machine running YouTubeSonos is available. (hint: use ifconfig/ipconfig)
+* **Endpoint URL**: the values provided for `web_server_url` and `smapi_path`. Or you can use the values provided for `web_server_host`, `web_server_port` and `smapi_path`. Note that if you are using 0.0.0.0 you should use an actual IP address on which the machine running YouTubeSonos is available. (hint: use ifconfig/ipconfig)
 
 * **Secure Endpoint URL**: same as Endpoint URL
 
@@ -55,14 +55,33 @@ Fill in the fields as follows:
 
 * **Authentication SOAP header policy**: Application Link
 
-* **Strings table (optional)**: do not fill (for now)
+* **Strings table (optional)**: `web_server_url`/Strings.xml
 
-* **Presentation map (optional)**: do not fill (for now)
+* **Presentation map (optional)**: `web_server_url`/PresentationMap.xml
 
 * **Container Type**: Music Service
 
-* **Capabilities**: Search (not yet supported)
+* **Capabilities**: Search
 
 And hit send.
 
 You should now be able to add YouTube just as any other normal Sonos music service by using your Sonos controller app.
+
+## Example configuration
+
+Using the following Settings.properties:
+
+```
+web_server_host=0.0.0.0
+web_server_port=8888
+web_server_url=http://youtubesonos.example.com:8888
+
+smapi_path=/youtubesonos
+auth_path=/oauth2callback
+
+media_server_url=http://example.com
+```
+
+This would be how to add the service to Sonos:
+
+![Adding YouTubeSonos to Sonos](addcustomsd.png)
