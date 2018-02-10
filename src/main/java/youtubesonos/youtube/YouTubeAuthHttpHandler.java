@@ -93,7 +93,7 @@ public class YouTubeAuthHttpHandler implements HttpHandler {
         }
     }
 
-    public static String getRedirectUri() {
+    public String getRedirectUri() {
         return S.getResources().getString(S.WEB_SERVER_URL) + S.getResources().getString(S.AUTH_PATH);
     }
 }

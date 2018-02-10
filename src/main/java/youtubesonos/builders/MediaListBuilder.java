@@ -37,7 +37,7 @@ public class MediaListBuilder implements Builder<MediaList> {
     }
 
     public MediaListBuilder addMedia(AbstractMediaBuilder mediaBuilder) {
-        return addMedia((AbstractMedia) mediaBuilder.build());
+        return addMedia(mediaBuilder.build());
     }
 
     @Override
