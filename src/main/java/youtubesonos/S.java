@@ -9,7 +9,7 @@ public class S {
     public static final String WEB_SERVER_URL = "web_server_url";
     public static final String SMAPI_PATH = "smapi_path";
     public static final String AUTH_PATH = "auth_path";
-    public static final String MEDIA_SERVER_URL = "media_server_url";
+    public static final String MEDIA_PATH = "media_path";
 
     private static Resources resources;
 

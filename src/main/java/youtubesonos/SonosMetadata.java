@@ -321,7 +321,7 @@ public class SonosMetadata {
                     .setArtistId(video.getSnippet().getChannelId())
                     .setAlbumArtURI(video.getSnippet().getThumbnails().getDefault().getUrl())
                     .setDuration(1))
-                .setMimeType("audio/aac")
+                .setMimeType("audio/mp3")
                 .setItemType(ItemType.TRACK)
                 .build();
     }
@@ -335,7 +335,7 @@ public class SonosMetadata {
                         .setArtistId(video.getSnippet().getChannelId())
                         .setAlbumArtURI(YT.getBestThumbnailUrl(video.getSnippet().getThumbnails()))
                         .setDuration((int)Duration.parse(video.getContentDetails().getDuration()).getSeconds()))
-                .setMimeType("audio/aac")
+                .setMimeType("audio/mp3")
                 .setItemType(ItemType.TRACK)
                 .build();
 }
@@ -347,7 +347,7 @@ public class SonosMetadata {
                 .setTrackMetadata(new TrackMetadataBuilder()
                         .setAlbumArtURI(YT.getWorstThumbnailUrl(playlistItem.getSnippet().getThumbnails()))
                         .setDuration(1))
-                .setMimeType("audio/aac")
+                .setMimeType("audio/mp3")
                 .setItemType(ItemType.TRACK)
                 .build();
     }
@@ -393,7 +393,7 @@ public class SonosMetadata {
                         .setArtistId(searchResult.getSnippet().getChannelId())
                         .setAlbumArtURI(YT.getWorstThumbnailUrl(searchResult.getSnippet().getThumbnails()))
                         .setDuration(1))
-                .setMimeType("audio/aac")
+                .setMimeType("audio/mp3")
                 .setItemType(ItemType.TRACK)
                 .build();
     }

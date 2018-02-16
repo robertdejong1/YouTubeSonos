@@ -13,12 +13,27 @@ Current features include:
 
 ## How it works
 
-YouTubeSonos uses the YouTube Data API v3 to retrieve content from YouTube which uses OAuth2 to authenticate a user.
+YouTubeSonos uses the YouTube Data API v3 to retrieve content from YouTube which uses OAuth2 to authenticate a user. In order for Sonos to display data from YouTube, the SMAPI implementation is used to act as a layer between YouTube and Sonos.
 
-It consists of three parts. The actual SMAPI implementation that acts as a layer between Sonos and YouTube, a very simple webserver which is used to receive OAuth2 callbacks and a PHP script to be run on a webserver (e.g. Apache) which uses `youtube-dl` to download the audio from YouTube and serve these files to Sonos.
+To actually play the sound from a YouTube video, `youtube-dl` is used to download the audio. This audio is then passed on through `ffmpeg` to covert Dash audio to mp3, because Sonos players cannot playback Dash audio.
+
+This is made available to the Sonos system by an http web server that is created when YouTubeSonos is started. The web server hosts the SMAPI implementation, an OAuth2 callback page for YouTube user authentication and a page that delivers the mp3 audio to a Sonos player.
 
 ## How to run
-First, you will need to obtain a YouTube Data API key. To do so, follow the first three steps as described [here](https://developers.google.com/youtube/v3/getting-started). Download the JSON file and put it in `src/main/resources` named `client_secret.json`
+
+YouTubeSonos currently only works on MacOS and Linux. This is because it uses `/bin/sh` with `youtube-dl` and `ffmpeg`. Use one of the following command to install these on your machine.
+
+On MacOS using homebrew
+```
+brew install youtube-dl ffmpeg
+```
+
+On Linux using apt
+```
+apt-get install youtube-dl ffmpeg
+```
+
+Next, you will need to obtain a YouTube Data API key. To do so, follow the first three steps as described [here](https://developers.google.com/youtube/v3/getting-started). Download the JSON file and put it in `src/main/resources` named `client_secret.json`
 
 Then you should configure the various settings in `src/main/resources/Settings.properties`:
 
@@ -32,7 +47,7 @@ Then you should configure the various settings in `src/main/resources/Settings.p
 
 * **auth_path**: the path on which the YouTube OAuth callbacks will be received. This and `web_server_url` are used as redirect URL after the user completes OAuth2 authentication. Make sure that this URL is listed as redirect URL in your project. Otherwise Google will return an error upon opening the authentication page.
 
-* **media_server_url**: the URL on which `youtube-dl.php` is available. Note that the user that runs this script (usually www-data) should have write permissions on a folder named `ytfiles` next to this script. Also, `youtube-dl` should be available.
+* **media_path**: This path will be used to store mp3 files of already played YouTube videos. When the audio of a YouTube video is requested by a Sonos player, YouTubeSonos will check wether or not the audio for this video is already present in this folder and use that one. If not, the audio will be downloaded and stored in this folder.
 
 Default values for these settings are provided in this file already to get you started.
 
@@ -79,7 +94,7 @@ web_server_url=http://youtubesonos.example.com:8888
 smapi_path=/youtubesonos
 auth_path=/oauth2callback
 
-media_server_url=http://example.com
+media_path=media
 ```
 
 This would be how to add the service to Sonos:

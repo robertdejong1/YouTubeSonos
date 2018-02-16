@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpServer;
 import javax.xml.ws.Endpoint;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
 public class WebServer {
 
@@ -14,6 +15,7 @@ public class WebServer {
     public WebServer(String hostname, int port) {
         try {
             server = HttpServer.create(new InetSocketAddress(hostname, port), 0);
+            server.setExecutor(Executors.newCachedThreadPool());
         }
         catch (IOException e) {
             e.printStackTrace();

@@ -14,8 +14,6 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -131,15 +129,7 @@ public class SonosApi implements SonosSoap {
 
         if (id.startsWith(IdPrefix.VIDEO.toString())) {
             String videoId = id.substring(IdPrefix.VIDEO.toString().length());
-            try {
-                //Hack to make server download m4a file first.
-                URL urlObj = new URL(S.getResources().getString(S.MEDIA_SERVER_URL) + "/youtube-dl.php?video=" + videoId);
-                ((HttpURLConnection) urlObj.openConnection()).getResponseCode();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            getMediaURIResult.value = String.format(S.getResources().getString(S.MEDIA_SERVER_URL) + "/ytfiles/%s.m4a", videoId);
+            getMediaURIResult.value = String.format("%s/stream?id=%s", S.getResources().getString(S.WEB_SERVER_URL), videoId);
         }
         else {
             throw SonosFaults.ITEM_NOT_FOUND;

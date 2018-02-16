@@ -1,16 +1,15 @@
 package youtubesonos.youtube;
 
+import base.AbstractHttpHandler;
 import base.ResourceHttpHandler;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import youtubesonos.S;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class YouTubeAuthHttpHandler implements HttpHandler {
+public class YouTubeAuthHttpHandler extends AbstractHttpHandler {
 
     private static YouTubeAuthHttpHandler instance;
 
@@ -62,22 +61,6 @@ public class YouTubeAuthHttpHandler implements HttpHandler {
         }
 
         new ResourceHttpHandler("/Auth_Failure.html").handle(httpExchange);
-    }
-
-    private Map<String, String> queryToMap(String query){
-        Map<String, String> result = new HashMap<String, String>();
-        if (query != null) {
-            for (String param : query.split("&")) {
-                String pair[] = param.split("=");
-                if (pair.length>1) {
-                    result.put(pair[0], pair[1]);
-                }
-                else {
-                    result.put(pair[0], "");
-                }
-            }
-        }
-        return result;
     }
 
     public void handleValidAuth(String linkCode, String code) {
