@@ -97,39 +97,6 @@ public class SonosMetadata {
         return null;
     }
 
-    public MediaList getChannelContents(String channelId, int index, int count, String userId) {
-        try {
-            String uploadsPlaylistId = YT.getUploadsPlaylist(channelId, userId);
-            PlaylistItemListResponse response = YT.getPlaylistVideos(uploadsPlaylistId, userId, index == 0 ? index : index - 1);
-
-            MediaListBuilder builder = new MediaListBuilder().setIndex(index).setTotal(response.getPageInfo().getTotalResults() + 1);
-
-            if (index == 0) {
-                builder.addMedia(new MediaCollectionBuilder()
-                        .setId(IdPrefix.CHANNELPLAYLISTS + channelId)
-                        .setTitle(R.getResources().getString(R.PLAYLISTS, sonosApi.getLocales()))
-                        .setItemType(ItemType.CONTAINER)
-                );
-                count--;
-            }
-
-            for (PlaylistItem item : response.getItems()) {
-                if (count == 0) break;
-
-                builder.addMedia(createMediaMetadata(item));
-                count--;
-            }
-
-            return builder.setCalculatedCount().build();
-
-        }
-        catch (IOException | PageTokenNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
     public MediaList getChannelPlaylists(String channelId, int index, int count, String userId) {
         try {
             PlaylistListResponse response = YT.getChannelPlaylists(channelId, userId, index);

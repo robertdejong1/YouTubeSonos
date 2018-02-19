@@ -4,7 +4,8 @@ public enum IdPrefix {
     CHANNEL("CH"),
     VIDEO("VI"),
     PLAYLIST("PL"),
-    CHANNELPLAYLISTS("CP");
+    CHANNELPLAYLISTS("CP"),
+    MULTIPLE_PLAYLISTS("MP");
 
     private final String value;
 

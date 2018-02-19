@@ -9,6 +9,9 @@ public class R {
     public static final String SUBSCRIPTIONS = "subscriptions";
     public static final String CHANNELS = "channels";
     public static final String VIDEOS = "videos";
+    public static final String LIKES = "likes";
+    public static final String FAVORITES = "favorites";
+    public static final String UPLOADS = "uploads";
 
     private static Resources resources;
 

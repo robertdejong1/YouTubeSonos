@@ -200,15 +200,6 @@ public class YT {
         return response;
     }
 
-    public static String getUploadsPlaylist(String channelId, String userId) throws IOException {
-        YouTube youtube = getYouTubeService(userId);
-        ChannelListResponse response = youtube.channels().list("contentDetails").setId(channelId).execute();
-        if (response.getItems().size() == 1) {
-            return response.getItems().get(0).getContentDetails().getRelatedPlaylists().getUploads();
-        }
-        return null;
-    }
-
     public static PlaylistListResponse getChannelPlaylists(String channelId, String userId, int pageIndex) throws PageTokenNotFoundException, IOException {
         String pageTokenCacheKey = "channelPlaylists" + channelId;
         PageTokenCacheItem pageTokenCacheItem = getPageTokenCacheItem(pageTokenCacheKey, userId, pageIndex);
@@ -246,4 +237,25 @@ public class YT {
 
         return response;
     }
+
+    public static ChannelListResponse getChannelInfo(String channelId, String userId) throws IOException {
+        YouTube youtube = getYouTubeService(userId);
+        return youtube.channels().list("contentDetails").setId(channelId).execute();
+    }
+
+    public static ChannelSectionListResponse getChannelSections(String channelId, String userId) throws IOException {
+        YouTube youtube = getYouTubeService(userId);
+        return youtube.channelSections().list("snippet,contentDetails").setChannelId(channelId).execute();
+    }
+
+    public static PlaylistListResponse getPlaylistInfo(String playlistId, String userId) throws IOException {
+        YouTube youtube = getYouTubeService(userId);
+        return youtube.playlists().list("snippet").setId(playlistId).setMaxResults((long)MAX_RESULTS).execute();
+    }
+
+    public static ChannelSectionListResponse getChannelSectionInfo(String channelSectionId, String userId) throws IOException {
+        YouTube youtube = getYouTubeService(userId);
+        return youtube.channelSections().list("contentDetails").setId(channelSectionId).execute();
+    }
+
 }

@@ -4,6 +4,8 @@ import smapi.*;
 import youtubesonos.builders.AppLinkInfoBuilder;
 import youtubesonos.builders.AppLinkResultBuilder;
 import youtubesonos.builders.DeviceLinkCodeResultBuilder;
+import youtubesonos.requesthandlers.ChannelMetadataRequestHandler;
+import youtubesonos.requesthandlers.MultiplePlaylistsMetadataRequestHandler;
 import youtubesonos.youtube.YT;
 import youtubesonos.youtube.YouTubeAuthHttpHandler;
 
@@ -62,7 +64,7 @@ public class SonosApi implements SonosSoap {
         }
 
         else if (id.startsWith(IdPrefix.CHANNEL.toString())) {
-            return sonosMetadata.getChannelContents(id.substring(IdPrefix.CHANNEL.toString().length()), index, count, userId);
+            return new ChannelMetadataRequestHandler(userId, this, id.substring(IdPrefix.CHANNEL.toString().length()), index, count).handle();
         }
 
         else if (id.startsWith(IdPrefix.PLAYLIST.toString())) {
@@ -71,6 +73,10 @@ public class SonosApi implements SonosSoap {
 
         else if (id.startsWith(IdPrefix.CHANNELPLAYLISTS.toString())) {
             return sonosMetadata.getChannelPlaylists(id.substring(IdPrefix.CHANNELPLAYLISTS.toString().length()), index, count, userId);
+        }
+
+        else if (id.startsWith(IdPrefix.MULTIPLE_PLAYLISTS.toString())) {
+            return new MultiplePlaylistsMetadataRequestHandler(userId, this, id.substring(IdPrefix.MULTIPLE_PLAYLISTS.toString().length()), index, count).handle();
         }
 
         throw SonosFaults.ITEM_NOT_FOUND;
